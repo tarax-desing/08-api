@@ -5,8 +5,9 @@ require_once '../data/usuario.php';
 la respuesta va a ser un objeto tipo JSON
 
 
-*/ 
-// header('Content-´Type: application/json');
+// */ 
+
+header('Content-Type: application/json');
 $usuario =new Usuario();
 /*
 la variable superglobal  $_SERVER ['REQUEST_METHOD']
@@ -17,6 +18,11 @@ PUT   Para actualizar datos existentes
 DELETE Para eliminar
 */
 $method = $_SERVER['REQUEST_METHOD'];
+$id = null;
+if(isset(explode('=', $_SERVER['REQUEST_URI'])[1])){
+  $request = explode('=', $_SERVER['REQUEST_URI'])[1];
+  $id = isset($request[0]) && is_numeric($request[0]) ? intval($request[0]) : null;
+}
 /**
  * 
  * CONTIENE INFO ADICIONAL SOBRE LA RUTA DE LA SOLICITUD ACTUAL
@@ -30,7 +36,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 //     $request =
 //     [];
 // }
-$request = explode('=', $_SERVER['REQUEST_URI'])[1];
+
 // var_dump($request);
 
 // $id = explode('=', $request);
@@ -48,7 +54,26 @@ switch($method) {
             $respuesta = getAllUsuarios($usuario);
         }
         echo json_encode($respuesta);
-        break;
+        break;  
+        case 'POST':
+            setUser($usuario);
+            break;
+            case 'PUT':
+                if($id){
+                    updateUser($usuario, $id);
+                }else{
+                    http_response_code(400);
+                    echo json_encode(['error' => 'ID no proporcionado']);
+
+                }break;
+                case 'DELETE':
+                    if($id){
+                        deleteUser( $usuario, $id);
+                    }else{
+                        http_response_code(400);
+                        echo json_encode(['error'=> 'ID no proporcionado']);
+                    }break;
+
         default:
         http_response_code(405);
         echo json_encode(['error'=> 'Método no permitido']);
@@ -61,3 +86,16 @@ function getUsuarioByid($usuario,$id) {
     function getAllUsuarios($usuario) {
         return $usuario->getAll();
     }
+function setUser($usuario) {
+    $data = json_decode(file_get_contents('php://input'),true);
+   $id = $usuario->create($data['nombre'],$data['email']);
+   echo json_encode(['$id'=> $id]);
+}
+
+
+    function updateUser($usuario, $id) {
+       
+    }
+
+    function deleteUser($usuario, $id) {}
+      
