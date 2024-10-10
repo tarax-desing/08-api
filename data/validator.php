@@ -39,5 +39,24 @@ return $errors;
 
     }
 
+    public function validarPelicula($data){
+        if (!isset($data['titulo']) || empty(trim($data['titulo']))) {
+            $errors['titulo'] = 'El titulo está vacio.';
+        } elseif (strlen($data['titulo']) < 2 || strlen($data['titulo']) > 100) {
 
+            $errors['titulo'] = 'El titulo sólo debe contener entre 2 y 100 caracteres';
+        }
+        if (!isset($data['precio']) || is_numeric($data['precio'])){
+            $errors['precio'] = 'El precio está vacio.';
+        } elseif (( $data['precio']) < 0) {
+            $errors['precio'] = 'El precio debe ser mayor de 0';
+        }
+        if (!isset($data['id_director']) || !is_numeric($data['id_director'])) {
+            $errors['id_director'] = 'El id_director está vacio.';
+    }return $errors;
+    
+
+
+
+}
 }

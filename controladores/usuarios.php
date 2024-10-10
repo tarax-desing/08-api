@@ -1,14 +1,16 @@
 <?php
 require_once '../data/usuario.php';
+require_once 'utilidades.php';
+
 
 /*establecer el encabezado
 la respuesta va a ser un objeto tipo JSON
 
 
-// */ 
+// */
 
 header('Content-Type: application/json');
-$usuario =new Usuario();
+$usuario = new Usuario();
 /*
 la variable superglobal  $_SERVER ['REQUEST_METHOD']
 REQUEST_METHOD  : puede ser:
@@ -18,11 +20,13 @@ PUT   Para actualizar datos existentes
 DELETE Para eliminar
 */
 $method = $_SERVER['REQUEST_METHOD'];
-$id = null;
-if(isset(explode('=', $_SERVER['REQUEST_URI'])[1])){
-  $request = explode('=', $_SERVER['REQUEST_URI'])[1];
-  $id = isset($request[0]) && is_numeric($request[0]) ? intval($request[0]) : null;
-}
+$uri = $_SERVER['REQUEST_URI'];
+
+//obtener los parámetros de la petición
+$parametros = Utilidades::parseUriParameters($uri);
+
+//obtener el parámetro id
+$id = Utilidades::getParameterValue($parametros, 'id');
 /**
  * 
  * CONTIENE INFO ADICIONAL SOBRE LA RUTA DE LA SOLICITUD ACTUAL
@@ -42,60 +46,83 @@ if(isset(explode('=', $_SERVER['REQUEST_URI'])[1])){
 // $id = explode('=', $request);
 
 
-$id = isset($request[0]) && is_numeric($request[0]) ? intval($request[0]) : null;
+// $id = isset($request[0]) && is_numeric($request[0]) ? intval($request[0]) : null;
+// Obtener la URI de la petición
 
 
 
-switch($method) {
-    case 'GET': 
-        if($id){
-            $respuesta = getUsuarioByid($usuario,$id);
-        }else{
+switch ($method) {
+    case 'GET':
+        if ($id) {
+            $respuesta = getUsuarioByid($usuario, $id);
+        } else {
             $respuesta = getAllUsuarios($usuario);
         }
         echo json_encode($respuesta);
-        break;  
-        case 'POST':
-            setUser($usuario);
-            break;
-            case 'PUT':
-                if($id){
-                    updateUser($usuario, $id);
-                }else{
-                    http_response_code(400);
-                    echo json_encode(['error' => 'ID no proporcionado']);
+        break;
+    case 'POST':
+        setUser($usuario);
+        break;
+    case 'PUT':
+        if ($id) {
+            updateUser($usuario, $id);
+        } else {
+            http_response_code(400);
+            echo json_encode(['error' => 'ID no proporcionado']);
+        }
+        break;
+    case 'DELETE':
+        if ($id) {
+            deleteUser($usuario, $id);
+        } else {
+            http_response_code(400);
+            echo json_encode(['error' => 'ID no proporcionado']);
+        }
+        break;
 
-                }break;
-                case 'DELETE':
-                    if($id){
-                        deleteUser( $usuario, $id);
-                    }else{
-                        http_response_code(400);
-                        echo json_encode(['error'=> 'ID no proporcionado']);
-                    }break;
-
-        default:
+    default:
         http_response_code(405);
-        echo json_encode(['error'=> 'Método no permitido']);
-       
-
+        echo json_encode(['error' => 'Método no permitido']);
 }
-function getUsuarioByid($usuario,$id) {
+function getUsuarioByid($usuario, $id)
+{
     return $usuario->getById($id);
 }
-    function getAllUsuarios($usuario) {
-        return $usuario->getAll();
-    }
-function setUser($usuario) {
-    $data = json_decode(file_get_contents('php://input'),true);
-   $id = $usuario->create($data['nombre'],$data['email']);
-   echo json_encode(['$id'=> $id]);
+function getAllUsuarios($usuario)
+{
+    return $usuario->getAll();
 }
-
-
-    function updateUser($usuario, $id) {
-       
+function setUser($usuario)
+{
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (isset($data['nombre']) && isset($data['email'])) {
+        $id = $usuario->create($data['nombre'], $data['email']);
+        echo json_encode(['id' => $id]); // Corregido
+    }else{
+        echo json_encode(['error'=> 'Datos insuficientes']);
     }
+}
+function updateUser($usuario, $id){
+    $data = json_decode(file_get_contents('php://input'), true);
 
-    function deleteUser($usuario, $id) {}
-      
+    if(isset($data['nombre']) && isset($data['email'])){
+      $affected = $usuario->update($id, $data['nombre'], $data['email']);
+      echo json_encode(['affected' => $affected]); 
+    }else{
+      echo json_encode(['error' => 'datos insuficientes']);
+    }
+ 
+  }
+        //    $affected = $usuario->update($id,$data['nombre'],$data['email']);
+        //    echo json_encode(['affected'=> $affected]);
+        // }
+
+        function deleteUser($usuario, $id)
+        {
+            $affected = $usuario->delete($id);
+            echo json_encode(['affected' => $affected]);
+        }
+        /////
+
+
+    
