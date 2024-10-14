@@ -24,13 +24,22 @@ class Usuario
     }
     public function create($nombre, $email)
     {
+
         $data = ['nombre' => $nombre, 'email' => $email];
         $dataSaneados = Validator::sanear($data);
         $errors = Validator::validar($dataSaneados);
 
+
         if (!empty($errors)) {
-           $errores = new ValidatorException($errors);
-            return $errores->getErrors();
+            $erroresString= '';
+            if(isset($errors['nombre'])){
+                $erroresString .= $errors['nombre'] . '';
+            }
+            if(isset(($errors['email']))){
+                $erroresString .= $errors['email'] . '';
+            }
+          
+            return $erroresString;
         }
         //lanzamos la consulta
         $nombreSaneado = $dataSaneados['nombre'];
@@ -52,11 +61,19 @@ class Usuario
         $data = ['id' => $id, 'nombre' => $nombre, 'email' => $email];
         $dataSaneados = Validator::sanear($data);
         $errors = Validator::validar($dataSaneados);
-
-        if(!empty($errors)){
-            $errores = new ValidatorException($errors);
-            return $errores->getErrors();
+        if (!empty($errors)) {
+            $erroresString= '';
+            if(isset($errors['nombre'])){
+                $erroresString .= $errors['nombre'] . '';
+            }
+            if(isset(($errors['email']))){
+                $erroresString .= $errors['email'] . '';
+            }
+          
+            return $erroresString;
         }
+
+       
         $nombreSaneado = $dataSaneados['nombre'];
         $emailSaneado = $dataSaneados['email'];
         $idSaneado = $dataSaneados['id'];
@@ -66,7 +83,7 @@ class Usuario
         $result = $this->db->query("SELECT id FROM usuario WHERE email = ? AND id != ?", [$emailSaneado, $idSaneado]);
 
         if ($result->num_rows > 0) {
-            return "El email ya está en uso por otro usuario";
+            return  "El email ya existe";
         }
 
         $this->db->query("UPDATE usuario SET nombre = ?, email = ? WHERE id = ?", [$nombreSaneado, $emailSaneado, $idSaneado]);
