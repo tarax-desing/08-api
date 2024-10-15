@@ -27,7 +27,7 @@ public function create($nombre, $apellido,$f_nacimiento, $biografia){
 
     if(!empty($errors)){
         $errores = new ValidatorException($errors);
-        return $errores->getErrors();
+        return $errors;
     }
     $nombreSaneado = $dataSaneados['nombre'];
     $apellidoSaneado = $dataSaneados['apellido'];
@@ -45,8 +45,8 @@ public function update($id, $nombre, $apellido, $f_nacimiento, $biografia ){
     $errors = Validator::validarDirector($dataSaneados);
 
     if(!empty($errors)){
-        $errores = new ValidatorException($errors);
-        return $errores->getErrors();
+       
+        return $errors;
     }
 
     $idSaneado = $dataSaneados['id'];

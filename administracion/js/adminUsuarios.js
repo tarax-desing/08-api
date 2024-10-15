@@ -1,5 +1,5 @@
 const API_URL = "http://localhost/08-php-api/controladores/usuarios.php";
-
+const errorElement = document.getElementById("createError");
 // @param {*} str
 // @return String limpio de caracteres HTMLAllCollection
 // limpia una cadena de texto convirtiendo ciertos caracteres potencialmente peligrosos en sus equivalentes html seguros.
@@ -64,7 +64,7 @@ function createUser(event) {
   event.preventDefault();
   const nombre = document.getElementById("createNombre").value.trim();
   const email = document.getElementById("createEmail").value.trim();
-//   const errorElement = document.getElementById("createError");
+  //   const errorElement = document.getElementById("createError");
   if (!validarNombre(nombre)) {
     errorElement.textContent = "El nombre debe tener entre 2 y 50 caracteres.";
     return;
@@ -85,48 +85,26 @@ function createUser(event) {
     .then((response) => response.json())
     .then((result) => {
       console.log("Usuario creado:", result);
-      if (esEntero(result["id"])) {
-        errorElement.textContent = "usuario creado";
+      if (!esEntero(result["id"])) {
+        mostrarErrores(result["id"]);
+      } else {
+        getUsers();
       }
-      getUsers();
       event.target.reset();
     })
     .catch((error) => {
-      console.log("Error", error);
-
-      errorElement.textContent = JSON.parse(error);
-    });
-  // alert('Crear usuario')
+      console.log("Error: ", JSON.stringify(error));
+    })
 }
 
-function editMode(id) {
-  const row = document.querySelector(`tr[data-id="${id}"]`);
-  row.querySelectorAll(".edicion").forEach((ro) => {
-    ro.style.display = "inline-block";
-  });
-  row.querySelectorAll(".listado").forEach((ro) => {
-    ro.style.display = "none";
-  });
-}
-function cancelEdit(id) {
-  const row = document.querySelector(`tr[data-id="${id}"]`);
-  row.querySelectorAll(".edicion").forEach((ro) => {
-    ro.style.display = "none";
-  });
-  row.querySelectorAll(".listado").forEach((ro) => {
-    ro.style.display = "inline-block";
-  });
-}
+
+
+
 function updateUser(id) {
   const row = document.querySelector(`tr[data-id="${id}"]`);
   const newNombre = row.querySelector("td:nth-child(2) input").value.trim();
   const newEmail = row.querySelector("td:nth-child(3) input").value.trim();
-  //
-  if (!validarNombre(newNombre)) {
-    alert("nombre con más caracteres");
-    return;
-  }
-  //
+
   if (!validarNombre(newNombre)) {
     alert("nombre con más caracteres");
     return;
@@ -145,17 +123,44 @@ function updateUser(id) {
     .then((response) => response.json())
     .then((result) => {
       console.log("usuario actualizado", result);
-      if(!esEntero(result['affected'])){
-        errorElement.innerHTML = result['affected'];
+      if (!esEntero(result["affected"])) {
+        mostrarErrores(result["affected"]);
       }else{
         getUsers();
       }
-     
     })
     .catch((error) => {
       console.error("error:", error);
       alert("error al actualizar prueba otra vez");
     });
+  }
+    function mostrarErrores(errores){
+      arrayErrores = Object.values(errores);
+      errorElement.innerHTML = '<ul>';
+      arrayErrores.forEach(error => {
+          return errorElement.innerHTML += `<li>${error}</li>`;
+      });
+      errorElement.innerHTML += '</ul>';
+  }
+  
+  function editMode(id){
+      const row = document.querySelector(`tr[data-id="${id}"]`);
+      row.querySelectorAll('.edicion').forEach(ro => {
+          ro.style.display = 'inline-block';
+      })
+      row.querySelectorAll('.listado').forEach(ro => {
+          ro.style.display = 'none';
+      })
+  }
+  function cancelEdit(id){
+      const row = document.querySelector(`tr[data-id="${id}"]`);
+      row.querySelectorAll('.edicion').forEach(ro => {
+          ro.style.display = 'none';
+      })
+      row.querySelectorAll('.listado').forEach(ro => {
+          ro.style.display = 'inline-block';
+      })
+    }
 
   function deleteUser(id) {
     if (confirm("¿Estás seguro de que quieres eliminar este usuario?")) {
@@ -171,7 +176,7 @@ function updateUser(id) {
     }
     // alert('Eliminar usuario ' + id);
   }
-}
+
 
 document.getElementById("createForm").addEventListener("submit", createUser);
 

@@ -31,8 +31,8 @@ public function create($titulo, $precio, $id_director){
     $errors = Validator::validarPelicula($dataSaneados);
 
     if(!empty($errors)){
-        $errores = new ValidatorException($errors);
-        return $errores->getErrors();
+        
+        return $errors;
     }
 
     $tituloSaneado = $dataSaneados['titulo'];
@@ -42,7 +42,7 @@ public function create($titulo, $precio, $id_director){
     // Verificar si el id_director existe
     $result = $this->cinebd->query("SELECT id FROM director WHERE id = ?", [$id_directorSaneado]);
     if ($result->num_rows == 0) {
-        return "El director no existe";
+        return ["director"=>"El director no existe"];
     }
 
     //lanzamos la consulta
@@ -57,8 +57,8 @@ public function update($id, $titulo, $precio, $id_director){
     $errors = Validator::validarPelicula($dataSaneados);
 
     if(!empty($errors)){
-        $errores = new ValidatorException($errors);
-        return $errores->getErrors();
+    
+        return $errors;
     }
     $tituloSaneado = $dataSaneados['titulo'];
     $precioSaneado = $dataSaneados['precio'];
@@ -69,7 +69,7 @@ public function update($id, $titulo, $precio, $id_director){
     // Verificar si el id_director existe
     $result = $this->cinebd->query("SELECT id FROM director WHERE id = ?", [$id_directorSaneado]);
     if ($result->num_rows == 0) {
-        return  "El director ya existe";
+      return  ["director"=>"El director no existe"];
     }
 
     $this->cinebd->query("UPDATE pelicula SET titulo = ?, precio = ?, id_director = ? WHERE id = ?", [$tituloSaneado, $precioSaneado, $id_directorSaneado, $idSaneado]);
