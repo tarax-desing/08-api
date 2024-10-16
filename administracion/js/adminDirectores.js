@@ -1,36 +1,49 @@
 const API_URL = "http://localhost/08-php-api/controladores/directores.php";
 const errorElement = document.getElementById("createError");
+/**
+ * 
+//  * @param {*} str string
+//  * @returns string limpio de caracteres html
+ * Limpia una cadena de texto convirtiendo ciertos caracteres potencialmente  peligrosos en sus equivalentes html seguros
+ * [^...] coincide con cualquier carácter que no esté en el conjunto
+ * \w Caracteres de palabra, letras, números, guión bajo
+ * . @- Admite punto, espacio, arroba y guión medio
+ * /gi Flags para que la búsqueda de caracteres sea global (g) e  insensible  a mayúsculas y minúsculas (i) 
+ * 
+ * funcion(c){return '&#' + caches.charCodeAt(0) + ';'} crea para cada carácter su código en ASCII con charCodeAt() 
+ * devuelve la entidad HTML numérica correspondiente, por ejemplo &#60; para < 
+ * Esta función se utiliza para prevenir ataques XSS(Cross-Site-Scripting) 
+ */
+function limpiarHTML(str){
+  return str.replace(/[^\w. @-]/gi, function(e) {
+      return '&#' + e.charCodeAt(0) + ';';
+  });
+}
+function esEntero(str) {
+  return /^\d+$/.test(str);
+}
+function validaciones(nombre, apellido, f_nacimiento, biografia){
+  let errores = [];
+  if(nombre.length <= 2 || nombre.length >= 50){
+      errores.push('El nombre debe tener entre 2 y 50 caracteres.');
+  }
+  if(apellido.length <= 2 || apellido.length >= 50){
+      errores.push('El apellido debe tener entre 2 y 50 caracteres.');
+  } 
+  if(isNaN(Date.parse(f_nacimiento))){
+    errores.push('La fecha no tiene un formato válido.');
+}
+const hoy = new Date();
+const fechaAComprobar = new Date(f_nacimiento);
+if(fechaAComprobar > hoy){
+    errores.push('La fecha no puede ser posterior a la actual');
+}
+if(biografia.length > 65500){
+  errores.push("La biografía es demasiado extensa, no debe tener más de 65.500 caracteres.");
+}
+return errores;
+}
 
-function limpiarHTML(str) {
-    return str.replace(/[^\w. @-]/gi, function (e) {
-      return "&#" + e.charCodeAt(0) + ";";
-    });
-  }
-  function validarNombre(nombre) {
-    return nombre.length >= 2 && nombre.length <= 50;
-  }
-  
-  function validarApellido(apellido) {
-    return true;
-  }
-
- 
-  function validarFecha(f_nacimiento) {
-    return true;
-  }
-  function esFechaAnterior(f_nacimiento){
-    const hoy = new Date();
-    const fechaAcomprobar = new Date(f_nacimiento);
-    return fechaAcomprobar < hoy;
-
-  }
-  function validarBiografia(biografia) {
-    return biografia.length < 65500;
-  }
-  function esEntero(str) {
-    return /^\d+$/.test(str);
-  }
-  
   function getDirectors() {
     fetch(API_URL)
       .then((response) => response.json())
@@ -82,24 +95,16 @@ function limpiarHTML(str) {
     const biografia = document.getElementById("createBiografia").value.trim();
     // const errorElement = document.getElementById("createError");
   
-    if (!validarNombre(nombre)) {
-      errorElement.textContent = "El nombre debe tener entre 2 y 50 caracteres.";
-      return;
-    }
-    if (!validarApellido(apellido)) {
-      errorElement.textContent = "El nombre de la película debe ser válido.";
-      return;
-    }
-    if (!validarFecha(f_nacimiento)) {
-        errorElement.textContent = "El formato fecha no es correcto.";
+    console.log('nombre', nombre);
+    let erroresValidaciones = validaciones(nombre, apellido, fecha_nacimiento, biografia);
+    console.log('erroresValidaciones ', erroresValidaciones.length);
+    if(erroresValidaciones.length > 0){
+        mostrarErrores(erroresValidaciones);
         return;
-      }
-    if (!validarBiografia(biografia)) {
-        errorElement.textContent = "Formato biografía incorrecto.";
-        return;
-      }
+    }
+    errorElement.innerHTML = '';
 
-    errorElement.textContent = "";
+     //envio al controlador los datos
   
     fetch(API_URL, {
       method: "POST",
@@ -111,38 +116,20 @@ function limpiarHTML(str) {
       .then((response) => response.json())
       .then((result) => {
         console.log("Director creado:", result);
-        if (esEntero(result["id"])) {
-          errorElement.textContent = "Director creado";
-        }
-        getDirectors();
-        event.target.reset();
-      })
-      .catch((error) => {
-        console.log("Error", error);
-        errorElement.textContent = JSON.stringify(error);
-      });
-  }
+        if(!parseInt(result['id'])){
+          erroresApi = Object.values(result['id']);
+          console.log("erroresApi:",  erroresApi);
+          mostrarErrores(erroresApi);
+      }else{
+          getDirectores();
+      }
+      event.target.reset();
+  })
+  .catch(error => {
+      console.log('Error: ', JSON.stringify(error));
+  })
+}
 
-  function editMode(id) {
-    const row = document.querySelector(`tr[data-id="${id}"]`);
-    row.querySelectorAll(".edicion").forEach((ro) => {
-      ro.style.display = "inline-block";
-    });
-    row.querySelectorAll(".listado").forEach((ro) => {
-      ro.style.display = "none";
-    });
-  }
-  
-  function cancelEdit(id) {
-    const row = document.querySelector(`tr[data-id="${id}"]`);
-    row.querySelectorAll(".edicion").forEach((ro) => {
-      ro.style.display = "none";
-    });
-    row.querySelectorAll(".listado").forEach((ro) => {
-      ro.style.display = "inline-block";
-    });
-  }
-  
   function updateDirector(id) {
     const row = document.querySelector(`tr[data-id="${id}"]`);
     const newNombre = row.querySelector("td:nth-child(2) input").value.trim();
@@ -150,15 +137,14 @@ function limpiarHTML(str) {
     const newFecha = row.querySelector("td:nth-child(4) input").value.trim();
     const newBiografia = row.querySelector("td:nth-child(5) textarea").value.trim();
   
-    if (!validarNombre(newNombre)) {
-      alert("El nombre debe tener entre 2 y 50 caracteres.");
-      return;
+    let erroresValidaciones = validaciones(newNombre, newApellido, newFecha, newBiografia);
+    if(erroresValidaciones.length > 0){
+        mostrarErrores(erroresValidaciones);
+        return;
     }
-    if (!validarApellido(newApellido)) {
-      alert("El apellido de la película no es válido.");
-      return;
-    }
+    errorElement.innerHTML = '';
   
+
     fetch(`${API_URL}?id=${id}`, {
       method: "PUT",
       headers: {
@@ -170,17 +156,47 @@ function limpiarHTML(str) {
       .then((result) => {
         console.log("Director actualizado", result);
         if (!esEntero(result['affected'])) {
-          errorElement.innerHTML = result['affected'];
-        } else {
+          erroresApi = Object.values(result['affected']);
+            mostrarErrores(erroresApi);
+        }else{
           getDirectors();
         }
       })
       .catch((error) => {
-        console.error("Error:", error);
+        console.error(error);
         alert("Error al actualizar. Por favor, inténtalo de nuevo.");
       });
   }
   
+  function mostrarErrores(errores){
+    errorElement.innerHTML = '<ul>';
+    errores.forEach(error => {
+        return errorElement.innerHTML += `<li>${error}</li>`;
+    });
+    errorElement.innerHTML += '</ul>';
+}
+function editMode(id){
+    errorElement.innerHTML = '';
+    const row = document.querySelector(`tr[data-id="${id}"]`);
+    row.querySelectorAll('.edicion').forEach(ro => {
+        ro.style.display = 'inline-block';
+    })
+    row.querySelectorAll('.listado').forEach(ro => {
+        ro.style.display = 'none';
+    })
+}
+function cancelEdit(id){
+    errorElement.innerHTML = '';
+    const row = document.querySelector(`tr[data-id="${id}"]`);
+    row.querySelectorAll('.edicion').forEach(ro => {
+        ro.style.display = 'none';
+    })
+    row.querySelectorAll('.listado').forEach(ro => {
+        ro.style.display = 'inline-block';
+    })
+}
+
+
   function deleteDirector(id) {
     if (confirm("¿Estás seguro de que quieres eliminar este director?")) {
       fetch(`${API_URL}?id=${id}`, {
