@@ -96,7 +96,7 @@ return errores;
     // const errorElement = document.getElementById("createError");
   
     console.log('nombre', nombre);
-    let erroresValidaciones = validaciones(nombre, apellido, fecha_nacimiento, biografia);
+    let erroresValidaciones = validaciones(nombre, apellido, f_nacimiento, biografia);
     console.log('erroresValidaciones ', erroresValidaciones.length);
     if(erroresValidaciones.length > 0){
         mostrarErrores(erroresValidaciones);
@@ -121,7 +121,7 @@ return errores;
           console.log("erroresApi:",  erroresApi);
           mostrarErrores(erroresApi);
       }else{
-          getDirectores();
+          getDirectors();
       }
       event.target.reset();
   })

@@ -50,7 +50,7 @@ function getDirectores(){
 }
 
 function getPeliculas(){
-    fetch(API_URL)
+    fetch(API_URL_PELICULAS)
     .then((response) => response.json())
     .then((peliculas) => {
      const tableBody = document.querySelector('#peliculasTable tbody');
@@ -80,6 +80,10 @@ function getPeliculas(){
                <span class="listado">${sanitizedTitulo}</span>
                   <input class="edicion" type="text" value="${sanitizedTitulo}">
               </td>
+               <td>
+                            <span class="listado">${sanitizedPrecio}</span>
+                            <input class="edicion" type="number" value="${sanitizedPrecio}">
+                        </td>
               <td>
                   <span class="listado">${directorSeleccionado.nombre}
                   ${directorSeleccionado.apellido}</span>
@@ -194,8 +198,8 @@ function cancelEdit(id){
     })
 }
 function deletePelicula(id) {
-    if (confirm("¿Estás seguro de que quieres eliminar esta película?")) {
-      fetch(`${API_URL}?id=${id}`, {
+    if (confirm("¿Estás seguro de que quieres eliminar esta película?")){
+      fetch(`${API_URL_PELICULAS}?id=${id}`, {
         method: "DELETE",
       })
       .then((response) => response.json())
