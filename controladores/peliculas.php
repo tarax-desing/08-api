@@ -57,8 +57,8 @@ function getAllPeliculas($pelicula)
 function setPelicula($pelicula)
 {
     $data = json_decode(file_get_contents('php://input'), true);
-    if (isset($data['titulo']) && isset($data['precio']) && isset($data['id_director'])) {
-        $id = $pelicula->create($data['titulo'], $data['precio'], $data['id_director']);
+    if (isset($data['titulo']) && isset($data['precio']) && isset($data['id_director']) && isset($data['cartel'])) {
+        $id = $pelicula->create($data['titulo'], $data['precio'], $data['id_director'], $data['cartel']);
         echo json_encode(['id' => $id]);
     } else {
         echo json_encode(['error' => 'Datos insuficientes']);
@@ -68,8 +68,8 @@ function setPelicula($pelicula)
 function updatePelicula($pelicula, $id)
 {
     $data = json_decode(file_get_contents('php://input'), true);
-    if (isset($data['titulo']) || isset($data['precio']) || isset($data['id_director'])) {
-        $result = $pelicula->update($id, $data['titulo'],$data['precio'],$data['id_director']);
+    if (isset($data['titulo']) || isset($data['precio']) || isset($data['id_director'])||isset($data['cartel'] )) {
+        $result = $pelicula->update($id, $data['titulo'],$data['precio'],$data['id_director'], $data['cartel']);
         echo json_encode(['success' => $result]);
     } else {
         echo json_encode(['error' => 'No se proporcionaron datos para actualizar']);
