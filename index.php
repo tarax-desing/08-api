@@ -11,7 +11,7 @@
 <body>
     <h1>Películas</h1>
     
-        <div id="track-grid"></div>
+        <div id ="track-grid" class="track-grid"></div>
     </div>
     <script src="java.js"></script>
 </body>

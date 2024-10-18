@@ -43,15 +43,14 @@ h1 {
   padding: 0 15px;
 }
 #track-grid div {
-  background-color: #fff; /* agrega un fondo blanco a cada celda */
-  padding: 20px; /* agrega un padding para separar el contenido del borde */
-  border: 1px solid #ddd; /* agrega un borde gris claro */
+  background-color: #fff; 
+  padding: 20px;
+  border: 1px solid #ddd; 
 }
 
 .track-item {
-  background-color: #181818;
   border-radius: 10px;
-  padding: 20px;
+ 
   text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -62,8 +61,8 @@ h1 {
 }
 
 .track-item img {
-  width: 25%;
-  height: 25%;
+  width: 100%;
+  height: auto;
   object-fit: cover;
   border-radius: 5px;
   margin-bottom: 15px;
