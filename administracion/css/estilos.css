@@ -34,7 +34,7 @@ form{
     margin-bottom: 20px;
 }
 
-input[type="text"],input[type="email"]{
+input[type="text"],input[type="email"] ,input[type='number'],select{
     padding: 5px;
     width: cal(100% - 12px);
     box-sizing: border-box;

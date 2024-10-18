@@ -16,7 +16,7 @@ class Pelicula {
     }
 
     public function getAll( ){
-        $result = $this->cinebd->query('SELECT id, titulo, precio, id_director FROM pelicula; ');
+        $result = $this->cinebd->query('SELECT id, titulo, precio, id_director,cartel FROM pelicula; ');
         return $result->fetch_all(MYSQLI_ASSOC);
     }
     public function getById( $id ){
@@ -25,8 +25,8 @@ class Pelicula {
         return $result->fetch_assoc();
 
 }
-public function create($titulo, $precio, $id_director){
-    $data = ['titulo' => $titulo, 'precio' => $precio, 'id_director' => $id_director];
+public function create($titulo, $precio, $id_director,$cartel){
+    $data = ['titulo' => $titulo, 'precio' => $precio, 'id_director' => $id_director, 'cartel' =>$cartel];
     $dataSaneados = Validator::sanear($data);
     $errors = Validator::validarPelicula($dataSaneados);
 
@@ -51,8 +51,8 @@ public function create($titulo, $precio, $id_director){
     return $this->cinebd->query("SELECT LAST_INSERT_ID() as id")->fetch_assoc()['id'];
 }
 
-public function update($id, $titulo, $precio, $id_director){
-    $data = ['id' => $id, 'titulo' => $titulo, 'precio' => $precio, 'id_director' => $id_director];
+public function update($id, $titulo, $precio, $id_director,$cartel){
+    $data = ['id' => $id, 'titulo' => $titulo, 'precio' => $precio, 'id_director' => $id_director,'cartel' =>$cartel];
     $dataSaneados = Validator::sanear($data);
     $errors = Validator::validarPelicula($dataSaneados);
 

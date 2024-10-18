@@ -1,0 +1,97 @@
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+}
+
+h1 {
+  text-align: center;
+  color: rgb(0, 0, 0);
+  margin-bottom: 30px;
+}
+
+/* Responsive: cuando la pantalla sea menor a 1024px */
+@media (max-width: 1024px) {
+  #track-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Responsive: cuando la pantalla sea menor a 768px */
+@media (max-width: 768px) {
+  #track-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Responsive: cuando la pantalla sea menor a 480px */
+@media (max-width: 480px) {
+  #track-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.track-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 10px; /* agrega un espacio entre las celdas */
+  gap: 20px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+#track-grid div {
+  background-color: #fff; /* agrega un fondo blanco a cada celda */
+  padding: 20px; /* agrega un padding para separar el contenido del borde */
+  border: 1px solid #ddd; /* agrega un borde gris claro */
+}
+
+.track-item {
+  background-color: #181818;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.track-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(29, 185, 84, 0.3);
+}
+
+.track-item img {
+  width: 25%;
+  height: 25%;
+  object-fit: cover;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+.track-item h3 {
+  font-size: 1.8em;
+  margin: 10px 0;
+  color: rgb(0, 0, 0);
+}
+
+.track-item p {
+  font-size: 0.9em;
+  color: #b3b3b3;
+  margin-bottom: 15px;
+}
+
+.track-item a {
+  display: inline-block;
+  background-color: #1db954;
+  color: #ffffff;
+  padding: 10px 15px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.track-item a:hover {
+  background-color: #1ed760;
+}

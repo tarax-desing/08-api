@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Películas</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --background-color: #f5f6fa;
+            --text-color: #2c3e50;
+            --shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Galería de películas */
+        .galeria {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .pelicula-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .pelicula-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .pelicula-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .pelicula-info {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .pelicula-titulo {
+            font-size: 1rem;
+            margin-bottom: 5px;
+            color: var(--primary-color);
+        }
+
+        .pelicula-precio {
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        /* Formulario de creación */
+        .form-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .form-title {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .btn {
+            background: var(--secondary-color);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        /* Mensaje de error */
+        #createError {
+            color: #e74c3c;
+            margin: 10px 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .galeria {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h2 class="form-title">Añadir Nueva Película</h2>
+            <form id="createForm">
+                <div class="form-group">
+                    <label for="createTitulo">Título:</label>
+                    <input type="text" id="createTitulo" required>
+                </div>
+                <div class="form-group">
+                    <label for="createPrecio">Precio:</label>
+                    <input type="number" step="0.01" id="createPrecio" required>
+                </div>
+                <div class="form-group">
+                    <label for="createCartel">URL del Cartel:</label>
+                    <input type="url" id="createCartel" required>
+                </div>
+                <div class="form-group">
+                    <label for="seleccionaDirector">Director:</label>
+                    <select id="seleccionaDirector" required></select>
+                </div>
+                <button type="submit" class="btn">Crear Película</button>
+            </form>
+            <div id="createError"></div>
+        </div>
+
+        <div id="galeria" class="galeria">
+            <!-- Aquí se cargarán las películas dinámicamente -->
+        </div>
+    </div>
+
+    <script>
+        const API_URL_PELICULAS = "http://localhost/08-php-api/controladores/peliculas.php";
+        const API_URL_DIRECTORES = "http://localhost/08-php-api/controladores/directores.php";
+        let listaDirectores = [];
+
+        function limpiarHTML(str) {
+            return str.replace(/[^\w. @-]/gi, function (e) {
+                return "&#" + e.charCodeAt(0) + ";";
+            });
+        }
+
+        function validaciones(titulo, precio, cartel, id_director) {
+            let errores = [];
+            if (titulo.length <= 2 || titulo.length >= 50) {
+                errores.push("El título debe tener entre 2 y 50 caracteres.");
+            }
+            const regexPrecio = /^\d{1,2}\.\d{1,2}$/;
+            if (!regexPrecio.test(precio)) {
+                errores.push("El precio no es válido");
+            }
+            try {
+                new URL(cartel);
+            } catch {
+                errores.push("La URL del cartel no es válida");
+            }
+            if (!Number.isInteger(parseInt(id_director, 10))) {
+                errores.push("El id del director es inválido.");
+            }
+            return errores;
+        }
+
+        function mostrarPeliculas(peliculas) {
+            const galeriaElement = document.getElementById('galeria');
+            galeriaElement.innerHTML = '';
+
+            peliculas.forEach(pelicula => {
+                const director = listaDirectores.find(d => d.id === pelicula.id_director);
+                const card = document.createElement('div');
+                card.className = 'pelicula-card';
+                
+                card.innerHTML = `
+                    <img src="${limpiarHTML(pelicula.cartel)}" 
+                         alt="${limpiarHTML(pelicula.titulo)}"
+                         onerror="this.src='placeholder.jpg'">
+                    <div class="pelicula-info">
+                        <h3 class="pelicula-titulo">${limpiarHTML(pelicula.titulo)}</h3>
+                        <p class="pelicula-precio">${limpiarHTML(pelicula.precio)}€</p>
+                        <p>Director: ${director ? limpiarHTML(director.nombre + ' ' + director.apellido) : 'No especificado'}</p>
+                    </div>
+                `;
+
+                galeriaElement.appendChild(card);
+            });
+        }
+
+        function createPelicula(event) {
+            event.preventDefault();
+            const titulo = document.getElementById("createTitulo").value.trim();
+            const precio = document.getElementById("createPrecio").value.trim();
+            const cartel = document.getElementById("createCartel").value.trim();
+            const id_director = document.getElementById("seleccionaDirector").value.trim();
+
+            const erroresValidaciones = validaciones(titulo, precio, cartel, id_director);
+            if (erroresValidaciones.length > 0) {
+                mostrarErrores(erroresValidaciones);
+                return;
+            }
+
+            fetch(API_URL_PELICULAS, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ titulo, precio, cartel, id_director }),
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (!parseInt(result['id'])) {
+                    mostrarErrores(Object.values(result['id']));
+                } else {
+                    getPeliculas();
+                    event.target.reset();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function mostrarErrores(errores) {
+            const errorElement = document.getElementById("createError");
+            errorElement.innerHTML = '<ul>' + 
+                errores.map(error => `<li>${error}</li>`).join('') + 
+                '</ul>';
+        }
+
+        function getDirectores() {
+            fetch(API_URL_DIRECTORES)
+                .then(response => response.json())
+                .then(directores => {
+                    listaDirectores = directores;
+                    const selectDirector = document.getElementById('seleccionaDirector');
+                    selectDirector.innerHTML = directores.map(director => 
+                        `<option value="${director.id}">
+                            ${limpiarHTML(director.nombre)} ${limpiarHTML(director.apellido)}
+                        </option>`
+                    ).join('');
+                    getPeliculas();
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function getPeliculas() {
+            fetch(API_URL_PELICULAS)
+                .then(response => response.json())
+                .then(peliculas => mostrarPeliculas(peliculas))
+                .catch(error => console.error('Error:', error));
+        }
+
+        document.getElementById("createForm").addEventListener("submit", createPelicula);
+        document.addEventListener('DOMContentLoaded', getDirectores);
+    </script>
+</body>
+</html>

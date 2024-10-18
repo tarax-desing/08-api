@@ -15,7 +15,8 @@ function esEntero(str) {
 
 function validaciones(titulo, precio, id_director) {
   let errores = [];
-  if (titulo.lengt <= 30) {
+  // if (titulo.lengt <= 30) {
+  if (titulo.length <=2 || titulo.length >=50){
     errores.push("El título debe tener menos de 30 caracteres.");
   }
   const regex = /^\d{1,2}\.\d{1,2}$/;
@@ -89,6 +90,11 @@ function getPeliculas(){
                   ${directorSeleccionado.apellido}</span>
                     <select class="edicion">${optionsHTML}</select>
               </td>
+              <td>
+                  <span class="listado">${pelicula.cartel}</span>
+                    <input class="edicion" type="text" value="${pelicula.cartel}">
+              </td>
+
                                      <td class="td-btn">
                             <button class="listado" onclick="editMode(${pelicula.id})">Editar</button>
                             <button class="listado" onclick="deletePelicula(${pelicula.id})">Eliminar</button>
@@ -106,6 +112,7 @@ function getPeliculas(){
         const titulo = document.getElementById("createTitulo").value.trim();
         const precio = document.getElementById("createPrecio").value.trim();
         const id_director = document.getElementById("createId_director").value.trim();
+        const cartel = document.getElementById("createCartel").value.trim();
       
         let erroresValidaciones = validaciones(titulo, precio, id_director);
         console.log('erroresValidaciones ', erroresValidaciones.length);
@@ -119,7 +126,7 @@ function getPeliculas(){
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ titulo, precio, id_director}),
+        body: JSON.stringify({ titulo, precio, id_director, cartel}),
       })
       .then((response) => response.json())
       .then((result) => {
@@ -142,6 +149,7 @@ function getPeliculas(){
     const newTitulo = row.querySelector("td:nth-child(2) input").value.trim();
     const newPrecio = row.querySelector("td:nth-child(3) input").value.trim();
     const newId_director = row.querySelector("td:nth-child(4) select").value.trim();
+    const newCartel = row.querySelector("td:nth-child(5) select").value.trim();
     let erroresValidaciones = validaciones(newTitulo, newPrecio, newId_director,);
     if(erroresValidaciones.length > 0){
         mostrarErrores(erroresValidaciones);
@@ -153,7 +161,7 @@ function getPeliculas(){
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({titulo: newTitulo, precio: newPrecio, id_director: newId_director}),
+        body: JSON.stringify({titulo: newTitulo, precio: newPrecio, id_director: newId_director, cartel: newCartel}),
       })
       .then((response) => response.json())
       .then((result) => {
@@ -210,6 +218,7 @@ function deletePelicula(id) {
         .catch((error) => console.error("Error", error));
     }
   }
+  
   
   document.getElementById("createForm").addEventListener("submit", createPelicula);
   document.addEventListener('DOMContentLoaded', getDirectores);
