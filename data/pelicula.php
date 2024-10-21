@@ -16,7 +16,7 @@ class Pelicula {
     }
 
     public function getAll( ){
-        $result = $this->cinebd->query('SELECT id, titulo, precio, id_director,cartel FROM pelicula; ');
+        $result = $this->cinebd->query('SELECT id, titulo, precio, id_director, cartel FROM pelicula; ');
         return $result->fetch_all(MYSQLI_ASSOC);
     }
     public function getById( $id ){

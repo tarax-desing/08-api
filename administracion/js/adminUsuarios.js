@@ -1,4 +1,4 @@
-const API_URL = "http://localhost/08-php-api/controladores/usuarios.php";
+const API_URL = " https://taraxdesing.com/08-php-api/controllers/usuarios.php;";
 const errorElement = document.getElementById("createError");
 // @param {*} str
 // @return String limpio de caracteres HTMLAllCollection
@@ -75,7 +75,11 @@ function createUser(event) {
   }
   errorElement.textContent = "";
 
+  
+
   fetch(API_URL, {
+    
+    
     method: "POST",
     headers: {
       "Content-Type": "aplication/json",

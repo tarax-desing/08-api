@@ -1,4 +1,15 @@
 <?php
+// Agrega estos headers al inicio de tu archivo peliculas.php
+header('Access-Control-Allow-Origin: https://taraxdesing.com');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+
+// Maneja la solicitud preliminar OPTIONS
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    header('HTTP/1.1 200 OK');
+    exit();
+}
+
 require_once '../data/usuario.php';
 require_once 'utilidades.php';
 
