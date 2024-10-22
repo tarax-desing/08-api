@@ -1,5 +1,5 @@
-const API_URL_PELICULAS = "http://localhost/08-php-api/controladores/peliculas.php";
-const API_URL_DIRECTORES = "http://localhost/08-php-api/controladores/directores.php";
+const API_URL_PELICULAS = 'https://taraxdesing.com/08-php-api/controllers/peliculas.php';
+const API_URL_DIRECTORES = 'https://taraxdesing.com/08-php-api/controllers/directores.php';
 const errorElement = document.getElementById("createError");
 let listaDirectores = [];
 
@@ -121,7 +121,7 @@ function getPeliculas(){
         return;
     }
     errorElement.innerHTML = '';
-    fetch(API_URL_PELICULAS, {
+    fetch(`${API_URL_PELICULAS}?metodo=nuevo`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -156,8 +156,8 @@ function getPeliculas(){
         return;
     }
     errorElement.innerHTML = '';
-    fetch(`${API_URL_PELICULAS}?id=${id}`, {
-        method: "PUT",
+    fetch(`${API_URL_PELICULAS}?id=${id}&metodo=actualizar`, {
+      method: 'POST',
         headers: {
           "Content-Type": "application/json",
         },
@@ -207,8 +207,8 @@ function cancelEdit(id){
 }
 function deletePelicula(id) {
     if (confirm("¿Estás seguro de que quieres eliminar esta película?")){
-      fetch(`${API_URL_PELICULAS}?id=${id}`, {
-        method: "DELETE",
+      fetch(`${API_URL_PELICULAS}?id=${id}&metodo=eliminar`, {
+        method: 'POST',
       })
       .then((response) => response.json())
         .then((result) => {

@@ -105,17 +105,20 @@ return errores;
     errorElement.innerHTML = '';
 
      //envio al controlador los datos
-  
-    fetch(API_URL, {
+     
+  ///////
+ 
+      fetch(`${API_URL}?metodo=nuevo`,{
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ nombre, apellido, f_nacimiento, biografia }),
+      body: JSON.stringify({nombre, apellido, f_nacimiento, biografia })
     })
-      .then((response) => response.json())
-      .then((result) => {
+      .then(response => response.json())
+      .then(result => {
         console.log("Director creado:", result);
+        //if(!esEntero(result['id'])){
         if(!parseInt(result['id'])){
           erroresApi = Object.values(result['id']);
           console.log("erroresApi:",  erroresApi);
@@ -144,9 +147,8 @@ return errores;
     }
     errorElement.innerHTML = '';
   
-
-    fetch(`${API_URL}?id=${id}`, {
-      method: "PUT",
+    fetch(`${API_URL}?id=${id}&metodo=actualizar`, {
+      method: 'POST',
       headers: {
         "Content-Type": "application/json",
       },
@@ -199,8 +201,8 @@ function cancelEdit(id){
 
   function deleteDirector(id) {
     if (confirm("¿Estás seguro de que quieres eliminar este director?")) {
-      fetch(`${API_URL}?id=${id}`, {
-        method: "DELETE",
+      fetch(`${API_URL}?id=${id}&metodo=eliminar`, {
+        method: 'POST',
       })
         .then((response) => response.json())
         .then((result) => {

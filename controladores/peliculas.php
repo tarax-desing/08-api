@@ -8,7 +8,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 $uri = $_SERVER['REQUEST_URI'];
 $parametros = Utilidades::parseUriParameters($uri);
 $id = Utilidades::getParameterValue($parametros, 'id');
-
+$metodo = Utilidades::getParameterValue($parametros, 'metodo');
 
 
 switch ($method) {
@@ -21,23 +21,26 @@ switch ($method) {
         echo json_encode($respuesta);
         break;
     case 'POST':
+        if($metodo == 'nuevo'){
         setPelicula($pelicula);
-        break;
-    case 'PUT':
+    }
+    if($metodo == 'actualizar'){
+    
         if ($id) {
             updatePelicula($pelicula, $id);
         } else {
             http_response_code(400);
             echo json_encode(['error' => 'ID no proporcionado']);
         }
-        break;
-    case 'DELETE':
+    }
+    if($metodo == 'eliminar'){
         if ($id) {
             deletePelicula($pelicula, $id);
         } else {
             http_response_code(400);
             echo json_encode(['error' => 'ID no proporcionado']);
         }
+    }
         break;
     default:
         http_response_code(405);
