@@ -1,4 +1,4 @@
-const API_URL = "http://localhost/08-php-api/controladores/directores.php";
+const API_URL = 'https://taraxdesing.com/08-php-api/controllers/directores.php';
 const errorElement = document.getElementById("createError");
 /**
  * 
