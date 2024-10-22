@@ -1,4 +1,4 @@
-const API_URL = " https://taraxdesing.com/08-php-api/controllers/usuarios.php;";
+const API_URL = " https://taraxdesing.com/controladores/usuarios.php;";
 const errorElement = document.getElementById("createError");
 // @param {*} str
 // @return String limpio de caracteres HTMLAllCollection

@@ -1,4 +1,4 @@
-const  url = 'http://localhost/08-php-api/controladores/peliculas.php';
+const  url = 'https://taraxdesing.com/controladores/peliculas.php';
 contenedorPeliculas=document.getElementById('track-grid')
 function getPeliculas (){
     fetch(url).then(result=>result.json()).then(data=>{
